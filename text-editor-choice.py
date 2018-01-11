@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # Copyright (c) 2017 Robert Knight
-# All rights reserved.
 
 # This creates a menu item that says "Open File With"
 # and then, the two programs are options to open the file with.  In this particular example
