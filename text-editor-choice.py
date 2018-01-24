@@ -11,12 +11,20 @@ from urllib import unquote
 
 PROGRAM_NAME = 'code'
 PROGRAM_NAME2 = 'gedit'
+PROGRAM_NAME3 = 'mousepad'
 
 class ExampleMenuProvider(GObject.GObject, Nautilus.MenuProvider):
     def __init__(self):
         pass
 
-    def launch_gedit(self, menu, files):
+    def launch_program1(self, menu, files):
+        if len(files) == 0:
+            return
+        file_name = [unquote(item.get_uri()[7:]) for item in files]
+        argv = [PROGRAM_NAME] + file_name
+        GObject.spawn_async(argv, flags=GObject.SPAWN_SEARCH_PATH)
+
+    def launch_program2(self, menu, files):
         if len(files) == 0:
             return
         # Strip the URI format to plain file names
@@ -24,13 +32,13 @@ class ExampleMenuProvider(GObject.GObject, Nautilus.MenuProvider):
         argv = [PROGRAM_NAME2] + file_name
         GObject.spawn_async(argv, flags=GObject.SPAWN_SEARCH_PATH)
 
-    def launch_code(self, menu, files):
+    def launch_program3(self, menu, files):
         if len(files) == 0:
             return
+        # Strip the URI format to plain file names
         file_name = [unquote(item.get_uri()[7:]) for item in files]
-        argv = [PROGRAM_NAME] + file_name
+        argv = [PROGRAM_NAME3] + file_name
         GObject.spawn_async(argv, flags=GObject.SPAWN_SEARCH_PATH)
-
 
     def get_file_items(self, window, files):
 
@@ -49,15 +57,23 @@ class ExampleMenuProvider(GObject.GObject, Nautilus.MenuProvider):
                                          tip='',
                                          icon='')
         submenu.append_item(sub_menuitem)
-
-        sub_menuitem.connect('activate', self.launch_code, files)
+        sub_menuitem.connect('activate', self.launch_program1, files)
 
         sub_menuitem2 = Nautilus.MenuItem(name='ExampleMenuProvider::Gedit',
                                          label='Gedit',
                                          tip='',
                                          icon='')
         submenu.append_item(sub_menuitem2)
-        sub_menuitem2.connect('activate', self.launch_gedit, files)
 
+        sub_menuitem2.connect('activate', self.launch_program2, files)
+
+        sub_menuitem3 = Nautilus.MenuItem(name='ExampleMenuProvider::Mousepad',
+                                         label='Mousepad',
+                                         tip='',
+                                         icon='')
+        submenu.append_item(sub_menuitem3)
+
+        sub_menuitem3.connect('activate', self.launch_program3, files)
 
         return top_menuitem,
+
